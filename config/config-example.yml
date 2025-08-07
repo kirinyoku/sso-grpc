@@ -1,0 +1,7 @@
+env: # Environment (local, dev, prod)
+storage_path: # Path to the storage file
+token_ttl: # Token time to live
+
+grpc:
+  port: # gRPC server port
+  timeout: # gRPC server timeout
