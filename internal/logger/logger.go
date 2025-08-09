@@ -1,3 +1,4 @@
+// Package logger provides functionality for creating a logger instance.
 package logger
 
 import (
@@ -7,7 +8,14 @@ import (
 	"github.com/kirinyoku/sso-grpc/internal/config"
 )
 
-func NewLogger(cfg *config.Config) *slog.Logger {
+// New creates a new logger instance based on the application environment.
+//
+// Parameters:
+//   - cfg: application configuration
+//
+// Returns:
+//   - *slog.Logger: new logger instance
+func New(cfg *config.Config) *slog.Logger {
 	var log *slog.Logger
 
 	switch cfg.Env {
