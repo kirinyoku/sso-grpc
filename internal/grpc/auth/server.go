@@ -4,8 +4,10 @@ package auth
 
 import (
 	"context"
+	"errors"
 
 	pb "github.com/kirinyoku/sso-grpc/internal/proto/auth"
+	"github.com/kirinyoku/sso-grpc/internal/services/auth"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -56,7 +58,11 @@ func (s *server) Register(ctx context.Context, req *pb.RegisterRequest) (*pb.Reg
 
 	userID, err := s.auth.Register(ctx, req.Email, req.Password)
 	if err != nil {
-		return nil, status.Error(codes.Internal, "failed to register user")
+		if errors.Is(err, auth.ErrUserExists) {
+			return nil, status.Error(codes.AlreadyExists, "user already exists")
+		}
+
+		return nil, status.Error(codes.Internal, "internal error")
 	}
 
 	return &pb.RegisterResponse{
@@ -80,7 +86,15 @@ func (s *server) Login(ctx context.Context, req *pb.LoginRequest) (*pb.LoginResp
 
 	token, err := s.auth.Login(ctx, req.Email, req.Password, req.AppId)
 	if err != nil {
-		return nil, status.Error(codes.Internal, "failed to login user")
+		if errors.Is(err, auth.ErrInvalidCredentials) {
+			return nil, status.Error(codes.InvalidArgument, "invalid credentials")
+		}
+
+		if errors.Is(err, auth.ErrInvalidAppID) {
+			return nil, status.Error(codes.InvalidArgument, "invalid app ID")
+		}
+
+		return nil, status.Error(codes.Internal, "internal error")
 	}
 
 	return &pb.LoginResponse{
@@ -103,7 +117,11 @@ func (s *server) IsAdmin(ctx context.Context, req *pb.IsAdminRequest) (*pb.IsAdm
 
 	isAdmin, err := s.auth.IsAdmin(ctx, req.UserId)
 	if err != nil {
-		return nil, status.Error(codes.Internal, "failed to check if user is admin")
+		if errors.Is(err, auth.ErrUserNotFound) {
+			return nil, status.Error(codes.NotFound, "user not found")
+		}
+
+		return nil, status.Error(codes.Internal, "internal error")
 	}
 
 	return &pb.IsAdminResponse{

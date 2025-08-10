@@ -39,7 +39,7 @@ type Storage interface {
 
 	// App retrieves application information by ID.
 	// Returns the app if found, or an error if the app doesn't exist or the operation fails.
-	App(ctx context.Context, appID int) (*models.App, error)
+	App(ctx context.Context, appID int32) (*models.App, error)
 }
 
 // Common authentication errors
@@ -52,6 +52,9 @@ var (
 
 	// ErrUserExists is returned when attempting to register a user that already exists
 	ErrUserExists = errors.New("user already exists")
+
+	// ErrUserNotFound is returned when a user is not found
+	ErrUserNotFound = errors.New("user not found")
 )
 
 // New creates a new instance of the Auth service with the provided dependencies.
@@ -132,7 +135,7 @@ func (a *Auth) Register(ctx context.Context, email string, password string) (int
 //   - ErrInvalidCredentials: if email/password is incorrect or user doesn't exist
 //   - ErrInvalidAppID: if the specified appID is invalid
 //   - other errors: for any other failure during authentication
-func (a *Auth) Login(ctx context.Context, email string, password string, appID int) (string, error) {
+func (a *Auth) Login(ctx context.Context, email string, password string, appID int32) (string, error) {
 	const op = "auth.Auth.Login"
 
 	log := a.log.With(
@@ -163,7 +166,7 @@ func (a *Auth) Login(ctx context.Context, email string, password string, appID i
 		if errors.Is(err, storage.ErrAppNotFound) {
 			log.Warn("app not found", slog.String("error", err.Error()))
 
-			return "", fmt.Errorf("%s: %w", op, ErrInvalidCredentials)
+			return "", fmt.Errorf("%s: %w", op, ErrInvalidAppID)
 		}
 
 		log.Error("failed to get app", slog.String("error", err.Error()))
@@ -194,7 +197,7 @@ func (a *Auth) Login(ctx context.Context, email string, password string, appID i
 //   - error: nil on success, or an error if the check fails
 //
 // Possible errors:
-//   - ErrInvalidAppID: if there's an issue with application configuration
+//   - ErrUserNotFound: if no user exists with the ID
 //   - other errors: for any other failure during the admin check
 func (a *Auth) IsAdmin(ctx context.Context, userID int64) (bool, error) {
 	const op = "auth.Auth.IsAdmin"
@@ -206,10 +209,10 @@ func (a *Auth) IsAdmin(ctx context.Context, userID int64) (bool, error) {
 
 	isAdmin, err := a.storage.IsAdmin(ctx, userID)
 	if err != nil {
-		if errors.Is(err, storage.ErrAppNotFound) {
-			log.Warn("app not found", slog.String("error", err.Error()))
+		if errors.Is(err, storage.ErrUserNotFound) {
+			log.Warn("user not found", slog.String("error", err.Error()))
 
-			return false, fmt.Errorf("%s: %w", op, ErrInvalidAppID)
+			return false, fmt.Errorf("%s: %w", op, ErrUserNotFound)
 		}
 
 		log.Error("failed to check if user is admin", slog.String("error", err.Error()))
