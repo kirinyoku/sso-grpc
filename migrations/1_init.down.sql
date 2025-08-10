@@ -1,0 +1,5 @@
+DROP TABLE IF EXISTS users;
+
+DROP TABLE IF EXISTS apps;
+
+DROP INDEX IF EXISTS idx_users_email;
