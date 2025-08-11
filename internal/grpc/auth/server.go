@@ -6,7 +6,7 @@ import (
 	"context"
 	"errors"
 
-	pb "github.com/kirinyoku/sso-grpc/internal/proto/auth"
+	pb "github.com/kirinyoku/sso-grpc/api/auth/v1"
 	"github.com/kirinyoku/sso-grpc/internal/services/auth"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"

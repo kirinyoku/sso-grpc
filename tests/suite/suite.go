@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"testing"
 
+	pb "github.com/kirinyoku/sso-grpc/api/auth/v1"
 	"github.com/kirinyoku/sso-grpc/internal/config"
-	pb "github.com/kirinyoku/sso-grpc/internal/proto/auth"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )

@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	pb "github.com/kirinyoku/sso-grpc/internal/proto/auth"
+	pb "github.com/kirinyoku/sso-grpc/api/auth/v1"
 )
 
 const (
