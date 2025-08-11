@@ -68,7 +68,7 @@ func (s *Storage) SaveUser(ctx context.Context, email string, passHash []byte) (
 
 	result, err := stmt.ExecContext(ctx, email, passHash)
 	if err != nil {
-		var sqliteErr *sqlite3.Error
+		var sqliteErr sqlite3.Error
 
 		if errors.As(err, &sqliteErr) && sqliteErr.ExtendedCode == sqlite3.ErrConstraintUnique {
 			return 0, fmt.Errorf("%s: %w", op, storage.ErrUserExists)
