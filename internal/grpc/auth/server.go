@@ -56,7 +56,7 @@ func (s *server) Register(ctx context.Context, req *pb.RegisterRequest) (*pb.Reg
 		return nil, err
 	}
 
-	userID, err := s.auth.Register(ctx, req.Email, req.Password)
+	userID, err := s.auth.Register(ctx, req.GetEmail(), req.GetPassword())
 	if err != nil {
 		if errors.Is(err, auth.ErrUserExists) {
 			return nil, status.Error(codes.AlreadyExists, "user already exists")
@@ -84,7 +84,7 @@ func (s *server) Login(ctx context.Context, req *pb.LoginRequest) (*pb.LoginResp
 		return nil, err
 	}
 
-	token, err := s.auth.Login(ctx, req.Email, req.Password, req.AppId)
+	token, err := s.auth.Login(ctx, req.GetEmail(), req.GetPassword(), req.GetAppId())
 	if err != nil {
 		if errors.Is(err, auth.ErrInvalidCredentials) {
 			return nil, status.Error(codes.InvalidArgument, "invalid credentials")
@@ -115,7 +115,7 @@ func (s *server) IsAdmin(ctx context.Context, req *pb.IsAdminRequest) (*pb.IsAdm
 		return nil, err
 	}
 
-	isAdmin, err := s.auth.IsAdmin(ctx, req.UserId)
+	isAdmin, err := s.auth.IsAdmin(ctx, req.GetUserId())
 	if err != nil {
 		if errors.Is(err, auth.ErrUserNotFound) {
 			return nil, status.Error(codes.NotFound, "user not found")
