@@ -33,13 +33,17 @@ func MustLoad() *Config {
 		panic("config path is not specified")
 	}
 
-	if _, err := os.Stat(configPath); os.IsNotExist(err) {
+	return MustLoadByPath(configPath)
+}
+
+func MustLoadByPath(path string) *Config {
+	if _, err := os.Stat(path); os.IsNotExist(err) {
 		panic("config file does not exist")
 	}
 
 	var cfg Config
 
-	if err := cleanenv.ReadConfig(configPath, &cfg); err != nil {
+	if err := cleanenv.ReadConfig(path, &cfg); err != nil {
 		panic("failed to load config: " + err.Error())
 	}
 
